@@ -5,12 +5,14 @@ const app = express()
 
 
 app.use(express.json())
+app.use(express.urlencoded({extended:false}))
 
 //routes
 
 app.get('/', (req, res) => {
     res.send('Hello World! yo yo')
 })
+
 
 app.get('/products/:id', async(req, res) => {
     try{
@@ -46,6 +48,20 @@ app.post('/products', async(req, res) => {
     }
 })          
 
+app.put('/products/:id', async(req, res) => {
+    try{
+        const{id}=req.params;
+        const product =await Product.findByIdAndUpdate(id,req.body);
+        //we cannot find any product in database
+        if(!product){
+            return res.status(404).json({message:`Product not found ${id}`})
+        }
+        const updatedProduct = await Product.findById(id);
+        res.status(200).json(updatedProduct);
+    }
+    catch(err){
+        res.status(500).json({message:err.message})
+    }})
 
 
 mongoose.
